@@ -83,5 +83,4 @@ tags:
 - [ ] 在 `src/content/pages/about.md` 里填上作品集外链（现在写着「待填」）
 - [ ] 接入 giscus 评论（文章多起来再说）。前置三件事：仓库 public、Settings → General → Features 开 **Discussions**、安装 [giscus app](https://github.com/apps/giscus)。然后在 <https://giscus.app/> 填仓库拿 `data-repo-id` / `data-category-id`，插到 `src/layouts/PostDetails.astro` 底部（分享按钮下面）。模板官方教程见 `_legacy/ap-demo-posts/how-to-integrate-giscus-comments.md`；建议用「纯 script + postMessage 跟随主题切换」，不必为此引入 React
 - [ ] 换一张自己的 `public/default-og.jpg`
-- [ ] 换一张自己的 `public/default-og.jpg`
 - [ ] 文章多了之后移植互链层
