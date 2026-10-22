@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPosts, formatDate, slugifyTag } from '../../lib/content';
+
+const posts = await getPosts();
+---
+<BaseLayout title="文章" description="全部文章列表">
+  <h1 class="page-title">文章</h1>
+  <p class="page-desc">记录折腾过程与技术笔记，共 {posts.length} 篇。</p>
+
+  <ul class="post-list">
+    {
+      posts.map((post) => (
+        <li>
+          <h3>
+            <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+          </h3>
+          <p>{post.data.description}</p>
+          <div class="post-meta">
+            {formatDate(post.data.pubDate)}
+            {post.data.tags.length > 0 && (
+              <>
+                {' · '}
+                {post.data.tags.map((tag, i) => (
+                  <>
+                    {i > 0 && '、'}
+                    <a href={`/tags/${slugifyTag(tag)}/`}>{tag}</a>
+                  </>
+                ))}
+              </>
+            )}
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>

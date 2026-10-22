@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { getProjects } from '../../lib/content';
+
+const projects = await getProjects();
+---
+<BaseLayout title="作品" description="做过的项目与工具">
+  <h1 class="page-title">作品</h1>
+  <p class="page-desc">做过的项目、工具和一些实验，共 {projects.length} 个。</p>
+
+  <div class="grid">
+    {projects.map((project) => <ProjectCard project={project} />)}
+  </div>
+</BaseLayout>

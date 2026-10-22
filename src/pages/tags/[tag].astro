@@ -1,0 +1,39 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPosts, collectTags, slugifyTag, formatDate } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  const tags = collectTags(posts);
+  return [...tags.keys()].map((tag) => ({
+    params: { tag: slugifyTag(tag) },
+    props: { tag, posts: posts.filter((post) => post.data.tags.includes(tag)) },
+  }));
+}
+
+interface Props {
+  tag: string;
+  posts: CollectionEntry<'blog'>[];
+}
+
+const { tag, posts } = Astro.props;
+---
+<BaseLayout title={`#${tag}`} description={`标签 ${tag} 下的全部文章`}>
+  <h1 class="page-title">#{tag}</h1>
+  <p class="page-desc">共 {posts.length} 篇 · <a href="/tags">全部标签</a></p>
+
+  <ul class="post-list">
+    {
+      posts.map((post) => (
+        <li>
+          <h3>
+            <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+          </h3>
+          <p>{post.data.description}</p>
+          <div class="post-meta">{formatDate(post.data.pubDate)}</div>
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>

@@ -1,0 +1,65 @@
+---
+import { render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getProjects } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { title, summary, year, stack, role, link, repo } = project.data;
+const { Content } = await render(project);
+---
+<BaseLayout title={title} description={summary}>
+  <article>
+    <header class="article-header">
+      <h1>{title}</h1>
+      <div class="article-meta">
+        {year}
+        {role && <>{' · '}{role}</>}
+      </div>
+      {
+        stack.length > 0 && (
+          <div class="stack">
+            {stack.map((item) => (
+              <span class="tag">{item}</span>
+            ))}
+          </div>
+        )
+      }
+    </header>
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    {
+      (link || repo) && (
+        <div class="hero-links">
+          {link && (
+            <a href={link} target="_blank" rel="noopener">
+              访问项目
+            </a>
+          )}
+          {repo && (
+            <a href={repo} target="_blank" rel="noopener">
+              查看源码
+            </a>
+          )}
+        </div>
+      )
+    }
+
+    <a class="back-link" href="/projects">← 回到作品列表</a>
+  </article>
+</BaseLayout>

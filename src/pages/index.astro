@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { SITE } from '../site';
+import { getPosts, getProjects, formatDate } from '../lib/content';
+
+const posts = await getPosts();
+const projects = await getProjects();
+const featured = projects.filter((project) => project.data.featured);
+const latest = posts.slice(0, 4);
+---
+<BaseLayout>
+  <section class="hero">
+    <h1>你好，我是 {SITE.name}</h1>
+    <p>{SITE.tagline}</p>
+    <div class="hero-links">
+      <a href="/projects">看看作品</a>
+      <a href="/blog">读读文章</a>
+      <a href={SITE.github} target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>精选作品</h2>
+      <a href="/projects">全部作品</a>
+    </div>
+    <div class="grid">
+      {featured.map((project) => <ProjectCard project={project} />)}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <h2>最新文章</h2>
+      <a href="/blog">全部文章</a>
+    </div>
+    <ul class="post-list">
+      {
+        latest.map((post) => (
+          <li>
+            <h3>
+              <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+            </h3>
+            <p>{post.data.description}</p>
+            <div class="post-meta">{formatDate(post.data.pubDate)}</div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>
