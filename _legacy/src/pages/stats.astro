@@ -1,0 +1,100 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLinkGraph } from '../lib/graph';
+
+const graph = await getLinkGraph();
+
+const mostLinked = [...graph.backlinks.entries()]
+  .map(([slug, refs]) => ({ slug, count: new Set(refs.map((r) => r.from)).size }))
+  .sort((a, b) => b.count - a.count || a.slug.localeCompare(b.slug))
+  .slice(0, 10);
+---
+
+<BaseLayout title="内容看板" description="文章互链情况、孤儿文章与失效链接检查">
+  <h1 class="page-title">内容看板</h1>
+  <p class="page-desc">
+    共 {graph.docs.length} 篇已发布文章，{graph.totalLinks} 条内部链接。
+  </p>
+
+  <div class="stat-grid">
+    <div class="stat">
+      <strong>{graph.orphans.length}</strong>
+      <span>孤儿文章（无入链）</span>
+    </div>
+    <div class="stat">
+      <strong>{graph.noTags.length}</strong>
+      <span>未打标签</span>
+    </div>
+    <div class="stat">
+      <strong class:list={[{ danger: graph.broken.length > 0 }]}>{graph.broken.length}</strong>
+      <span>失效链接</span>
+    </div>
+    <div class="stat">
+      <strong class:list={[{ danger: graph.draftTargets.length > 0 }]}>
+        {graph.draftTargets.length}
+      </strong>
+      <span>指向草稿</span>
+    </div>
+  </div>
+
+  {
+    graph.broken.length > 0 && (
+      <section class="section">
+        <h2 class="section-title">失效链接</h2>
+        <ul class="plain-list">
+          {graph.broken.map((ref) => (
+            <li>
+              <code>{ref.from}</code> 第 {ref.line} 行 → <code>{ref.target}</code>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  {
+    graph.orphans.length > 0 && (
+      <section class="section">
+        <h2 class="section-title">孤儿文章</h2>
+        <ul class="plain-list">
+          {graph.orphans.map((slug) => (
+            <li>
+              <a href={`/blog/${slug}/`}>{graph.titles.get(slug) ?? slug}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  {
+    graph.noTags.length > 0 && (
+      <section class="section">
+        <h2 class="section-title">未打标签</h2>
+        <ul class="plain-list">
+          {graph.noTags.map((slug) => (
+            <li>
+              <a href={`/blog/${slug}/`}>{graph.titles.get(slug) ?? slug}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  {
+    mostLinked.length > 0 && (
+      <section class="section">
+        <h2 class="section-title">被引用最多</h2>
+        <ul class="plain-list">
+          {mostLinked.map((item) => (
+            <li>
+              <a href={`/blog/${item.slug}/`}>{graph.titles.get(item.slug) ?? item.slug}</a>
+              <span class="dim"> · {item.count} 篇引用</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+</BaseLayout>

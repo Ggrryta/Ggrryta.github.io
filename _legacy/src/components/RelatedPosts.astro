@@ -1,0 +1,31 @@
+---
+interface Item {
+  slug: string;
+  title: string;
+  description: string;
+}
+
+interface Props {
+  items: Item[];
+}
+
+const { items } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <section class="related">
+      <h2>相关</h2>
+      <ul class="post-list">
+        {items.map((item) => (
+          <li>
+            <h3>
+              <a href={`/blog/${item.slug}/`}>{item.title}</a>
+            </h3>
+            <p>{item.description}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}

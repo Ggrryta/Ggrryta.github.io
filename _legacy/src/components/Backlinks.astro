@@ -1,0 +1,26 @@
+---
+import type { LinkRef } from '../lib/graph';
+
+interface Props {
+  backlinks: LinkRef[];
+  titles: Map<string, string>;
+}
+
+const { backlinks, titles } = Astro.props;
+---
+
+{
+  backlinks.length > 0 && (
+    <section class="backlinks">
+      <h2>被引用 · {backlinks.length}</h2>
+      <ul>
+        {backlinks.map((ref) => (
+          <li>
+            <a href={`/blog/${ref.from}/`}>{titles.get(ref.from) ?? ref.from}</a>
+            {ref.context && <p class="link-context">{ref.context}</p>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}

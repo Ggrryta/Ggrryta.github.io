@@ -1,0 +1,14 @@
+---
+import { SITE } from '../site';
+const year = new Date().getUTCFullYear();
+---
+<footer class="site-footer">
+  <div class="container">
+    <span>&copy; {year} {SITE.author}</span>
+    <span>
+      <a href="/rss.xml">RSS</a>
+      &middot; <a href="/stats">看板</a>
+      &middot; Built with Astro &amp; GitHub Pages
+    </span>
+  </div>
+</footer>

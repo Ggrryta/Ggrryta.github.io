@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPosts, collectTags, slugifyTag } from '../../lib/content';
+
+const posts = await getPosts();
+const tags = collectTags(posts);
+---
+<BaseLayout title="标签" description="全部文章标签">
+  <h1 class="page-title">标签</h1>
+  <p class="page-desc">按主题浏览文章，共 {tags.size} 个标签。</p>
+
+  <div class="tag-cloud">
+    {
+      [...tags].map(([tag, count]) => (
+        <a href={`/tags/${slugifyTag(tag)}/`}>
+          {tag} <span style="opacity:.6">{count}</span>
+        </a>
+      ))
+    }
+  </div>
+</BaseLayout>
