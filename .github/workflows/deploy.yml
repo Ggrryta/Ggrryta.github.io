@@ -23,7 +23,9 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          # Astro 7 要求 Node >= 22.23.4；写 "22" 可能解析到 22.23.3 而直接启动失败，
+          # 因此固定到 24 LTS
+          node-version: 24
       - name: Install dependencies
         run: npm ci
 
