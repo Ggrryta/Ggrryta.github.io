@@ -34,20 +34,25 @@ jobs:
             echo "node=$(node -v)"
             echo "npm=$(npm -v)"
             echo "astro_bin=$(ls node_modules/.bin/ 2>/dev/null | grep -c '^astro$')"
+            echo "astrojs_check=$([ -d node_modules/@astrojs/check ] && echo yes || echo no)"
+            echo "pagefind=$([ -d node_modules/pagefind ] && echo yes || echo no)"
+            echo "typescript=$([ -d node_modules/typescript ] && echo yes || echo no)"
             echo "sharp_installed=$([ -d node_modules/sharp ] && echo yes || echo no)"
             node -e "try{require('sharp');console.log('sharp_load=OK')}catch(e){console.log('sharp_load=FAIL: '+String(e.message).split('\n')[0])}"
-            node -e "try{require('satori');console.log('satori_load=OK')}catch(e){console.log('satori_load=FAIL: '+String(e.message).split('\n')[0])}"
             echo "disk=$(df -h . | tail -1 | awk '{print $4}')"
           } | sed 's/^/::notice::/'
 
-      # 失败时把日志尾部作为 error annotation 输出，便于直接看到真实原因
+      # 失败时把日志尾部压成单行作为 error annotation 输出，便于直接看到真实原因
       - name: Build
         run: |
           set -o pipefail
-          npm run build 2>&1 | tee build.log || {
-            echo "::error::$(tail -60 build.log)"
+          if npm run build > build.log 2>&1; then
+            tail -5 build.log
+          else
+            echo "::error::$(grep -inE 'error|cannot|not found|failed|ELIFECYCLE' build.log | tail -20 | tr '\n' '|')"
+            echo "::error::log-head: $(head -40 build.log | tr '\n' '|')"
             exit 1
-          }
+          fi
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
